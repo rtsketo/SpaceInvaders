@@ -14,8 +14,14 @@ import winsound
 
 # Play sound file
 def play_sound(file): pass
+
+
 def play_sound_win(file): winsound.PlaySound(file, winsound.SND_ASYNC)
+
+
 def play_sound_mac(file): os.system(f"afplay {file}&")
+
+
 def play_sound_lnx(file): os.system(f"aplay {file}&")
 
 
@@ -80,23 +86,25 @@ number_of_enemies = 4
 # Create an empty list of enemies
 enemiesList = []
 
+# Create an empty list of enemies' speed
+enemySpeedList = []
+
 # Add enemies to the list
 # We need to create more turtle objects
 
 for i in range(number_of_enemies):
     # Create the enemy
-    enemiesList.append(turtle.Turtle())
-
-for enemy in enemiesList:
+    enemy = turtle.Turtle()
     enemy.color("red")
     enemy.shape("invader.gif")
     enemy.speed(0)
     enemy.penup()
-    x = random.randint(-200, 200)
-    y = random.randint(100, 200)
-    enemy.setposition(x, y)
+    enemy.setposition(
+        random.randint(-200, 200),
+        random.randint(100, 200))
 
-enemy_speed = 2
+    enemiesList.append(enemy)
+    enemySpeedList.append(random.randint(1, 23))
 
 # Create the player's bullet
 bullet = turtle.Turtle()
@@ -167,21 +175,22 @@ turtle.onkey(fire_bullet, "space")
 
 # Main game loop
 while True:
-    for enemy in enemiesList:
+    for i in range(number_of_enemies):
         # This is a forever loop
         # Move the enemy
+        enemy = enemiesList[i]
         x = enemy.xcor()
-        x = x + enemy_speed
+        x = x + enemySpeedList[i]
         enemy.setx(x)
 
         # Move enemy back and down
         if enemy.xcor() > 280:
-            enemy_speed = enemy_speed * -1
+            enemySpeedList[i] = enemySpeedList[i] * -1
             y = enemy.ycor()
             y = y - 40
             enemy.sety(y)
         if enemy.xcor() < -280:
-            enemy_speed = enemy_speed * -1
+            enemySpeedList[i] = enemySpeedList[i] * -1
             y = enemy.ycor()
             y = y - 40
             enemy.sety(y)
