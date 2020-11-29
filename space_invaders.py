@@ -8,9 +8,26 @@ import turtle
 import os
 import math
 import random
+import winsound
+import platform
+
+
+# Play sound file
+def play_sound(file): pass
+def play_sound_win(file): winsound.PlaySound(file, winsound.SND_ASYNC)
+def play_sound_mac(file): os.system(f"afplay {file}&")
+def play_sound_lnx(file): os.system(f"aplay {file}&")
+
+
+# Define play_sound based on OS
+if platform.system() == "Windows":
+    play_sound = play_sound_win
+elif platform.system() == "Darwin":
+    play_sound = play_sound_mac
+else:
+    play_sound = play_sound_lnx
 
 # Set up the screen
-
 win = turtle.Screen()
 win.bgcolor("black")
 win.title("Space Invaders")
@@ -102,7 +119,6 @@ bullet_state = "ready"
 
 
 # Move the player left and right
-
 # noinspection PyShadowingNames
 def move_left():
     x = player.xcor()
@@ -126,8 +142,7 @@ def fire_bullet():
     # Declare bullet_state as a global if it needs change
     global bullet_state
     if bullet_state == "ready":
-        os.system("afplay laser.wav&")
-        # for linux use os.system("aplay laser.wav&")
+        play_sound("laser.wav")
         # Move the bullet to just above the player
         x = player.xcor()
         y = player.ycor() + 10
@@ -173,8 +188,7 @@ while True:
 
         # Check for collision between bullet and enemy
         if is_collision(bullet, enemy):
-            os.system("afplay explosion.wav&")
-            # for linux use os.system("aplay explosion.wav&")
+            play_sound("explosion.wav")
             # Reset the bullet
             bullet.hideturtle()
             bullet_state = "ready"
@@ -191,8 +205,7 @@ while True:
 
         # Check for collision between enemy and player
         if is_collision(player, enemy):
-            os.system("afplay explosion.wav&")
-            # for linux use os.system("aplay explosion.wav&")
+            play_sound("explosion.wav")
             player.hideturtle()
             enemy.hideturtle()
             print("GAME OVER")
