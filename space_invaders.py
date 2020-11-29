@@ -51,7 +51,7 @@ for side in range(4):
 border_pen.hideturtle()
 
 # Set the score to 0
-score = 0
+score = 100
 
 # Draw the score on stage
 score_pen = turtle.Turtle()
