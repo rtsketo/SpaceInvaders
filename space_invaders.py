@@ -4,12 +4,12 @@
 # Python Game Programming Tutorial: Space Invaders
 # http://christianthompson.com/
 
-import turtle
-import os
 import math
-import random
-import winsound
+import os
 import platform
+import random
+import turtle
+import winsound
 
 
 # Play sound file
@@ -75,7 +75,7 @@ player.setheading(90)
 player_speed = 15
 
 # Choose number of enemies
-number_of_enemies = 5
+number_of_enemies = 4
 
 # Create an empty list of enemies
 enemiesList = []
