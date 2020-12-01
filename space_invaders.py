@@ -57,7 +57,17 @@ for side in range(4):
 border_pen.hideturtle()
 
 # Set the score to 0
-score = 100
+score = 0
+
+
+# Update the score
+def inc_score(value):
+    global score
+    score += value
+    score_string = "Score: %s" % score
+    score_pen.clear()
+    score_pen.write(score_string, False, align="left", font=("Arial", 14, "bold"))
+
 
 # Draw the score on stage
 score_pen = turtle.Turtle()
@@ -65,9 +75,8 @@ score_pen.speed(0)
 score_pen.color("white")
 score_pen.penup()
 score_pen.setposition(-290, 280)
-score_string = "Score: %s" % score
-score_pen.write(score_string, False, align="left", font=("Arial", 14, "bold"))
 score_pen.hideturtle()
+inc_score(+100)
 
 # Create the player turtle
 player = turtle.Turtle()
@@ -148,7 +157,7 @@ def move_right():
 # noinspection PyShadowingNames
 def fire_bullet():
     # Declare bullet_state as a global if it needs change
-    global bullet_state
+    global bullet_state, score
     if bullet_state == "ready":
         play_sound("laser.wav")
         # Move the bullet to just above the player
@@ -157,6 +166,7 @@ def fire_bullet():
         bullet.setposition(x, y)
         bullet.showturtle()
         bullet_state = "fire"
+        inc_score(-1)
 
 
 def is_collision(t1, t2):
@@ -206,11 +216,7 @@ while True:
             x = random.randint(-200, 200)
             y = random.randint(100, 200)
             enemy.setposition(x, y)
-            # Update the score
-            score += 10
-            score_string = "Score: %s" % score
-            score_pen.clear()
-            score_pen.write(score_string, False, align="left", font=("Arial", 14, "bold"))
+            inc_score(+10)
 
         # Check for collision between enemy and player
         if is_collision(player, enemy):
