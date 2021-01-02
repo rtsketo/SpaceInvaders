@@ -112,10 +112,10 @@ def create_enemy(ship_type: Ship,
     if x_pos is None: x_pos = random.randint(-10, 10) * 20
     if y_pos is None: y_pos = random.randint(2, 5) * 40
     ship = turtle.Turtle()
-    ship.shape(ship_type.value)
-    ship.speed(0)
     ship.penup()
     ship.setposition(x_pos, y_pos)
+    ship.shape(ship_type.value)
+    ship.speed(0)
     enemies.append(Enemy(ship, random.random() * 2 + 1))
     return ship
 
@@ -210,11 +210,12 @@ while True:
     for enemy in enemies:
 
         # Move enemies down
-        if enemy.ship.xcor() > 280 or enemy.ship.xcor() < -280:
+        if enemy.ship.xcor() >= 280 or enemy.ship.xcor() <= -280:
             change_enemy_direction()
 
         # Move the enemy
-        enemy.ship.setx(enemy.ship.xcor() + enemy.speed * direction)
+        enemy.ship.setx(min(max(
+            enemy.ship.xcor() + enemy.speed * direction, -280), 280))
 
         # Check for collision between bullet and enemy
         if is_collision(bullet, enemy.ship):
