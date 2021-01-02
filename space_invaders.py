@@ -182,13 +182,13 @@ def fire_bullet():
     # Declare bullet_state as a global if it needs change
     global bullet_state, score
     if bullet_state == "ready":
+        bullet_state = "fire"
         play_sound("laser.wav")
         # Move the bullet to just above the player
         x = player.xcor()
         y = player.ycor() + 10
         bullet.setposition(x, y)
         bullet.showturtle()
-        bullet_state = "fire"
         inc_score(-1)
 
 
@@ -254,9 +254,9 @@ while True:
         y = y + bullet_speed
         bullet.sety(y)
 
-    # Check to see if bullet has reached the top
-    if bullet.ycor() > 275:
-        bullet.hideturtle()
-        bullet_state = "ready"
+        # Check to see if bullet has reached the top
+        if y > 275:
+            bullet.hideturtle()
+            bullet_state = "ready"
 
 # delay = raw_input("Press enter to finish")
