@@ -13,6 +13,7 @@ import winsound
 from enum import Enum
 from typing import List
 
+
 # Play sound file
 def play_sound(file): pass
 def play_sound_win(file): winsound.PlaySound(file, winsound.SND_ASYNC)
@@ -146,6 +147,7 @@ bullet.penup()
 bullet.setheading(90)
 bullet.shapesize(0.5, 0.5)
 bullet.hideturtle()
+bullet.setposition(0, -400)
 
 bullet_speed = 20
 
