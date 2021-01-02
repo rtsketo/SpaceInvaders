@@ -11,18 +11,12 @@ import random
 import turtle
 import winsound
 from enum import Enum
-
+from typing import List
 
 # Play sound file
 def play_sound(file): pass
-
-
 def play_sound_win(file): winsound.PlaySound(file, winsound.SND_ASYNC)
-
-
 def play_sound_mac(file): os.system(f"afplay {file}&")
-
-
 def play_sound_lnx(file): os.system(f"aplay {file}&")
 
 
@@ -39,6 +33,14 @@ class Ship(Enum):
     GREEN = "enemy_green.gif"
     PLAYER = "spaceship.gif"
     RED = "enemy_red.gif"
+
+
+class Enemy:
+    def __init__(self,
+                 ship: turtle.Turtle,
+                 speed: float):
+        self.ship = ship
+        self.speed = speed
 
 
 # Set up the screen
@@ -99,7 +101,7 @@ player_speed = 15
 number_of_enemies = 4
 
 # Create an empty list of enemies
-enemies = []
+enemies: List[Enemy] = []
 
 
 # Create the enemy
@@ -114,7 +116,7 @@ def create_enemy(ship_type: Ship,
     ship.speed(0)
     ship.penup()
     ship.setposition(x_pos, y_pos)
-    enemies.append([ship, random.random() * 2 + 1])
+    enemies.append(Enemy(ship, random.random() * 2 + 1))
     return ship
 
 
@@ -131,11 +133,8 @@ direction = 1
 def change_enemy_direction():
     global direction
     direction *= -1
-    for i in range(len(enemies)):
-        enemy = enemies[i][0]
-        y = enemy.ycor()
-        y = y - 40
-        enemy.sety(y)
+    for enemy in enemies:
+        enemy.ship.sety(enemy.ship.ycor() - 40)
 
 
 # Create the player's bullet
@@ -194,7 +193,7 @@ def fire_bullet():
 def is_collision(t1, t2):
     distance = math.sqrt(math.pow(t1.xcor() - t2.xcor(), 2)
                          + math.pow(t1.ycor() - t2.ycor(), 2))
-    if distance < 15:
+    if distance < 20:
         return True
     else:
         return False
@@ -208,40 +207,43 @@ turtle.onkey(fire_bullet, "space")
 
 # Main game loop
 while True:
-    for i in range(len(enemies)):
-        enemy = enemies[i][0]
+    for enemy in enemies:
 
         # Move enemies down
-        if enemy.xcor() >= 280 or enemy.xcor() <= -280:
+        if enemy.ship.xcor() > 280 or enemy.ship.xcor() < -280:
             change_enemy_direction()
 
         # Move the enemy
-        enemy.setx(enemy.xcor() + enemies[i][1] * direction)
+        enemy.ship.setx(enemy.ship.xcor() + enemy.speed * direction)
 
         # Check for collision between bullet and enemy
-        if is_collision(bullet, enemy):
+        if is_collision(bullet, enemy.ship):
             play_sound("explosion.wav")
             # Reset the bullet
             bullet.hideturtle()
             bullet_state = "ready"
             bullet.setposition(0, -400)
-            # Spawn minions
-            if enemy.shape() == Ship.GREEN.value:
-                create_enemy(Ship.RED, enemy.xcor() + 20, enemy.ycor())
-                create_enemy(Ship.RED, enemy.xcor() - 20, enemy.ycor())
-            # Reset the enemy
-            x = random.randint(-200, 200)
-            y = random.randint(100, 200)
-            enemy.setposition(x, y)
-            inc_score(+10)
+            if enemy.ship.shape() == Ship.GREEN.value:
+                # Spawn minions
+                create_enemy(Ship.RED, enemy.ship.xcor() + 20, enemy.ship.ycor())
+                create_enemy(Ship.RED, enemy.ship.xcor() - 20, enemy.ship.ycor())
+                inc_score(+10)
+            else: inc_score(+20)
+            enemies.remove(enemy)
+            enemy.ship.clear()
+            enemy.ship.ht()
 
         # Check for collision between enemy and player
-        if is_collision(player, enemy):
+        if is_collision(player, enemy.ship):
             play_sound("explosion.wav")
+            enemy.ship.hideturtle()
             player.hideturtle()
-            enemy.hideturtle()
             print("GAME OVER")
-            break
+            exit()
+
+    if len(enemies) == 0:
+        print("YOU WIN")
+        break
 
     # Move the bullet only when bullet_state is "fire"
     if bullet_state == "fire":
