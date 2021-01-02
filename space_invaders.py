@@ -10,6 +10,7 @@ import platform
 import random
 import turtle
 import winsound
+from enum import Enum
 
 
 # Play sound file
@@ -33,6 +34,13 @@ elif platform.system() == "Darwin":
 else:
     play_sound = play_sound_lnx
 
+
+class Ship(Enum):
+    GREEN = "enemy_green.gif"
+    PLAYER = "spaceship.gif"
+    RED = "enemy_red.gif"
+
+
 # Set up the screen
 win = turtle.Screen()
 win.bgcolor("black")
@@ -40,8 +48,7 @@ win.title("Space Invaders")
 win.bgpic("space_invaders_background.gif")
 
 # Register the graphics for the game
-turtle.register_shape("invader.gif")
-turtle.register_shape("player.gif")
+for ship_type in Ship: turtle.register_shape(ship_type.value)
 
 # Draw border
 border_pen = turtle.Turtle()
@@ -80,8 +87,7 @@ inc_score(+100)
 
 # Create the player turtle
 player = turtle.Turtle()
-player.color("blue")
-player.shape("player.gif")
+player.shape(Ship.PLAYER.value)
 player.speed(0)
 player.penup()
 player.setposition(0, -250)
@@ -95,25 +101,26 @@ number_of_enemies = 4
 # Create an empty list of enemies
 enemiesList = []
 
-# Create an empty list of enemies' speed
-enemySpeedList = []
+
+# Create the enemy
+# noinspection PyShadowingNames
+def create_enemy(ship_type: Ship,
+                 x_pos: float = None,
+                 y_pos: float = None):
+    if x_pos is None: x_pos = random.randint(-200, 200)
+    if y_pos is None: y_pos = random.randint(100, 200)
+    ship = turtle.Turtle()
+    ship.shape(ship_type.value)
+    ship.speed(0)
+    ship.penup()
+    ship.setposition(x_pos, y_pos)
+    enemiesList.append([ship, random.randint(1, 3)])
+    return ship
+
 
 # Add enemies to the list
 # We need to create more turtle objects
-
-for i in range(number_of_enemies):
-    # Create the enemy
-    enemy = turtle.Turtle()
-    enemy.color("red")
-    enemy.shape("invader.gif")
-    enemy.speed(0)
-    enemy.penup()
-    enemy.setposition(
-        random.randint(-200, 200),
-        random.randint(100, 200))
-
-    enemiesList.append(enemy)
-    enemySpeedList.append(random.randint(1, 23))
+for i in range(number_of_enemies): create_enemy(Ship.GREEN)
 
 # Create the player's bullet
 bullet = turtle.Turtle()
@@ -149,8 +156,7 @@ def move_left():
 def move_right():
     x = player.xcor()
     x = x + player_speed
-    if x > 280:
-        x = 280
+    if x > 280: x = 280
     player.setx(x)
 
 
@@ -170,7 +176,8 @@ def fire_bullet():
 
 
 def is_collision(t1, t2):
-    distance = math.sqrt(math.pow(t1.xcor() - t2.xcor(), 2) + math.pow(t1.ycor() - t2.ycor(), 2))
+    distance = math.sqrt(math.pow(t1.xcor() - t2.xcor(), 2)
+                         + math.pow(t1.ycor() - t2.ycor(), 2))
     if distance < 15:
         return True
     else:
@@ -185,22 +192,17 @@ turtle.onkey(fire_bullet, "space")
 
 # Main game loop
 while True:
-    for i in range(number_of_enemies):
+    for i in range(len(enemiesList)):
         # This is a forever loop
         # Move the enemy
-        enemy = enemiesList[i]
+        enemy = enemiesList[i][0]
         x = enemy.xcor()
-        x = x + enemySpeedList[i]
+        x = x + enemiesList[i][1]
         enemy.setx(x)
 
         # Move enemy back and down
-        if enemy.xcor() > 280:
-            enemySpeedList[i] = enemySpeedList[i] * -1
-            y = enemy.ycor()
-            y = y - 40
-            enemy.sety(y)
-        if enemy.xcor() < -280:
-            enemySpeedList[i] = enemySpeedList[i] * -1
+        if enemy.xcor() > 280 or enemy.xcor() < -280:
+            enemiesList[i][1] *= -1
             y = enemy.ycor()
             y = y - 40
             enemy.sety(y)
@@ -212,6 +214,10 @@ while True:
             bullet.hideturtle()
             bullet_state = "ready"
             bullet.setposition(0, -400)
+            # Spawn minions
+            if enemy.shape() == Ship.GREEN.value:
+                create_enemy(Ship.RED, enemy.xcor() + 20, enemy.ycor())
+                create_enemy(Ship.RED, enemy.xcor() - 20, enemy.ycor())
             # Reset the enemy
             x = random.randint(-200, 200)
             y = random.randint(100, 200)
