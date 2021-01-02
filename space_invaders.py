@@ -107,20 +107,36 @@ enemies = []
 def create_enemy(ship_type: Ship,
                  x_pos: float = None,
                  y_pos: float = None):
-    if x_pos is None: x_pos = random.randint(-10, 10)*20
-    if y_pos is None: y_pos = random.randint(2, 5)*40
+    if x_pos is None: x_pos = random.randint(-10, 10) * 20
+    if y_pos is None: y_pos = random.randint(2, 5) * 40
     ship = turtle.Turtle()
     ship.shape(ship_type.value)
     ship.speed(0)
     ship.penup()
     ship.setposition(x_pos, y_pos)
-    enemies.append([ship, random.random()*2+1])
+    enemies.append([ship, random.random() * 2 + 1])
     return ship
 
 
 # Add enemies to the list
 # We need to create more turtle objects
 for i in range(number_of_enemies): create_enemy(Ship.GREEN)
+
+# Global enemy movement direction
+direction = 1
+
+
+# Change direction of all ships
+# noinspection PyShadowingNames
+def change_enemy_direction():
+    global direction
+    direction *= -1
+    for i in range(len(enemies)):
+        enemy = enemies[i][0]
+        y = enemy.ycor()
+        y = y - 40
+        enemy.sety(y)
+
 
 # Create the player's bullet
 bullet = turtle.Turtle()
@@ -193,19 +209,14 @@ turtle.onkey(fire_bullet, "space")
 # Main game loop
 while True:
     for i in range(len(enemies)):
-        # This is a forever loop
-        # Move the enemy
         enemy = enemies[i][0]
-        x = enemy.xcor()
-        x = x + enemies[i][1]
-        enemy.setx(x)
 
-        # Move enemy back and down
-        if enemy.xcor() > 280 or enemy.xcor() < -280:
-            enemies[i][1] *= -1
-            y = enemy.ycor()
-            y = y - 40
-            enemy.sety(y)
+        # Move enemies down
+        if enemy.xcor() >= 280 or enemy.xcor() <= -280:
+            change_enemy_direction()
+
+        # Move the enemy
+        enemy.setx(enemy.xcor() + enemies[i][1] * direction)
 
         # Check for collision between bullet and enemy
         if is_collision(bullet, enemy):
