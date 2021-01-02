@@ -99,7 +99,7 @@ player_speed = 15
 number_of_enemies = 4
 
 # Create an empty list of enemies
-enemiesList = []
+enemies = []
 
 
 # Create the enemy
@@ -107,14 +107,14 @@ enemiesList = []
 def create_enemy(ship_type: Ship,
                  x_pos: float = None,
                  y_pos: float = None):
-    if x_pos is None: x_pos = random.randint(-200, 200)
-    if y_pos is None: y_pos = random.randint(100, 200)
+    if x_pos is None: x_pos = random.randint(-10, 10)*20
+    if y_pos is None: y_pos = random.randint(2, 5)*40
     ship = turtle.Turtle()
     ship.shape(ship_type.value)
     ship.speed(0)
     ship.penup()
     ship.setposition(x_pos, y_pos)
-    enemiesList.append([ship, random.randint(1, 3)])
+    enemies.append([ship, random.randint(1, 3)])
     return ship
 
 
@@ -192,17 +192,17 @@ turtle.onkey(fire_bullet, "space")
 
 # Main game loop
 while True:
-    for i in range(len(enemiesList)):
+    for i in range(len(enemies)):
         # This is a forever loop
         # Move the enemy
-        enemy = enemiesList[i][0]
+        enemy = enemies[i][0]
         x = enemy.xcor()
-        x = x + enemiesList[i][1]
+        x = x + enemies[i][1]
         enemy.setx(x)
 
         # Move enemy back and down
         if enemy.xcor() > 280 or enemy.xcor() < -280:
-            enemiesList[i][1] *= -1
+            enemies[i][1] *= -1
             y = enemy.ycor()
             y = y - 40
             enemy.sety(y)
