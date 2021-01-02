@@ -114,7 +114,7 @@ def create_enemy(ship_type: Ship,
     ship.speed(0)
     ship.penup()
     ship.setposition(x_pos, y_pos)
-    enemies.append([ship, random.randint(1, 3)])
+    enemies.append([ship, random.random()*2+1])
     return ship
 
 
